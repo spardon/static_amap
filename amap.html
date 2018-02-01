@@ -30,10 +30,11 @@
     var acc_w = 0.05484400000000278;
     var acc_h = 0.0268519999999981;
 
-    var top_y = 26.809048;
-    var left_x = 106.228631;
-    var right_x = 106.871162;
-    var bottom_y = 26.477766;
+    // 119.844409,36.417573,120.65877,35.8375970
+    var top_y = 36.417573;
+    var left_x = 119.844409;
+    var right_x = 120.65877;
+    var bottom_y = 35.8375970;
 
     var w = parseInt((right_x - left_x) / acc_w) + 1;
     // h = parseInt((top - bottom) / acc_h) + 1;
@@ -42,7 +43,8 @@
     var map = new AMap.Map('container', {
         resizeEnable: true,
         zoom:15,
-        center: [106.228631,26.809048]
+        // center: [106.228631,26.809048]
+        center: [119.844409,36.417573]
     });
     var arr = [];
     for (var i=0; i<h;  i++ ){
@@ -51,17 +53,23 @@
         }
     }
 
-    var i = 0;
+     var clickEventListener = map.on('click', function(e) {
+         st = e.lnglat.getLng() + ',' + e.lnglat.getLat();
+         console.log(st);
+    });
+
+    var i = -1;
     var j = 0;
     function to_origin() {
         i += 1;
-        map.setZoomAndCenter(15, [106.228631,26.809048]);
+        map.setZoomAndCenter(15, [119.844409,36.417573]);
+        console.log(i)
     };
     function vertical_move(){
-        map.panBy(0, -343*i);
+        map.panBy(0, -614*i);
     }
     function level_move(){
-        map.panBy(-642, 0);
+        map.panBy(-640, 0);
     }
 </script>
 </body>

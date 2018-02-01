@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>静态地图截取</title>
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+    <script src="https://cache.amap.com/lbs/static/es5.min.js"></script>
+    <script src="https://webapi.amap.com/maps?v=1.4.3&key=您申请的key值"></script>
+    <!-- <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script> -->
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <style type="text/css">
+        #pagetop {
+            position: absolute;
+            width: auto;
+            height: 50px;
+            top: 5px;
+            left: 0px;
+            font-family: "Microsoft Yahei";
+            font-size: 14px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgb(204, 204, 204);
+            border-image: initial;
+            margin: 10px auto;
+            padding: 6px;
+        }
+        .button-group {
+            width: 400px;
+            height: 50px;
+        }
+        div {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="pagetop">
+<form class="form-inline">
+  <div class="form-group">
+    <label for="exampleInputName2">LT</label>
+    <input type="text" class="form-control" id="left-top" placeholder="116.397428, 39.90923">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail2">BR</label>
+    <input type="email" class="form-control" id="right-bottom" placeholder="116.397428, 39.90923">
+  </div>
+</form>
+</div>
+<div class="button-group" style="top: 60px;left: 20px;">
+    <input type="button" id="origin" class="button" value="重置原点" style="background: green;" onclick="to_origin()"/>
+    <input type="button" id="level" class="button" value="水平移动" onclick="level_move()"/>
+    <input type="button" id="vertical" class="button" value="垂直移动" style="background: orange;" onclick="vertical_move()"/>
+    <input type="button" id="start_ss" class="button" value="开始截屏" style="background: red;margin-left: 130px;" onclick="start_ss()"/>
+    <input type="button" id="start" style="visibility: hidden;" value=0>
+    <input type="button" id="level_num" style="visibility: hidden;" value=0>
+</div>
+<script>
+    var zoom = 17;
+    var map = new AMap.Map('container', {
+        resizeEnable: true,
+        zoom:zoom,
+        center: [116.397428, 39.90923]
+    });
+    var lt;
+    var br;
+    var lng_t;
+    var lat_t;
+    var lng_b;
+    var lat_b;
+    var cur_center;
+    var vertical_num = -1;
+    var i = 0;
+
+    var clickEventListener = map.on('click', function(e) {
+        if (i == 0) {
+            i += 1;
+            document.getElementById('left-top').value = e.lnglat.getLng() + ',' + e.lnglat.getLat();
+        }
+        else{
+            i -= 1;
+            document.getElementById('right-bottom').value = e.lnglat.getLng() + ',' + e.lnglat.getLat();
+        }
+    });
+
+    function start_ss() {
+        // body...
+        lt = document.getElementById('left-top').value;
+        br = document.getElementById('right-bottom').value;
+        lng_t = parseFloat(lt.split(',')[0]);
+        lat_t = parseFloat(lt.split(',')[1]);
+        lng_b = parseFloat(br.split(',')[0]);
+        lat_b = parseFloat(br.split(',')[1]);
+        cur_center = [lng_t, lat_t]
+        map.setZoomAndCenter(zoom, cur_center)
+        document.getElementById('start').value = 1;
+    }
+
+    function center_info(lv){
+        center = map.getCenter();
+        lng = center.lng;
+        lat = center.lat;
+        if (lv == 'l') {
+            return lng;
+        }
+        else{
+            return lat;
+        }
+    }
+
+    function level_move() {
+        lng = center_info('l');
+        if(lng < lng_b){
+            map.panBy(-640, 0);
+        }else{
+            // 停止水平移动
+            document.getElementById('level_num').value = 1;
+        }
+    }
+
+    function to_origin() {
+        map.setCenter(cur_center);
+    }
+
+    function vertical_move() {
+        lat = center_info('v');
+        if (lat > lat_b) {
+            // 垂直移动并记录当前的center
+            vertical_num += 1;
+            map.panBy(0, -614);
+            cur_center = [center_info('l'), center_info('v')]
+             document.getElementById('level_num').value = 0;
+        }else{
+            document.getElementById('start').value = 2;
+        }
+    }
+
+</script>
+</body>
+</html>
