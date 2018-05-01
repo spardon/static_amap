@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>简单地图</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<style type="text/css">
+html,body{
+    width:100%;
+    height:100%;
+}
+*{
+    margin:0px;
+    padding:0px;
+}
+body, button, input, select, textarea {
+    font: 12px/16px Verdana, Helvetica, Arial, sans-serif;
+}
+p{
+    width:603px;
+    padding-top:3px;
+    overflow:hidden;
+}
+.btn{
+    width:142px;
+}
+#container{
+    min-width:600px;
+    min-height:767px;
+}
+#pagetop{
+    position: absolute;
+    top: 10px;
+    width: 462px;
+}
+.button-group{
+    position: absolute;
+}
+.btn{
+    width: 80px;
+}
+</style>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp"></script>
+<script>
+
+
+</script>
+</head>
+<body>
+<!--   定义地图显示容器   -->
+<div id="container"></div>
+<div id="pagetop">
+<form class="form-inline">
+  <div class="form-group">
+    <label for="exampleInputName2">LT</label>
+    <input type="text" class="form-control" id="left-top" placeholder="116.397428, 39.90923">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail2">BR</label>
+    <input type="email" class="form-control" id="right-bottom" placeholder="116.397428, 39.90923">
+  </div>
+</form>
+</div>
+<div class="button-group" style="top: 60px;left: 20px;">
+    <input type="button" id="origin" class="btn btn-success" value="重置原点" onclick="to_origin()"/>
+    <input type="button" id="level" class="btn btn-default" value="水平移动" onclick="level_move()"/>
+    <input type="button" id="vertical" class="btn btn-primary" value="垂直移动" onclick="vertical_move()"/>
+    <input type="button" id="start_ss" class="btn btn-danger" value="开始截屏" style="margin-left: 105px;" onclick="start_ss()"/>
+    <input type="button" id="start" style="visibility: hidden;" value=0>
+    <input type="button" id="level_num" style="visibility: hidden;" value=0>
+</div>
+</body>
+<style type="text/css">
+    .smnoprint{
+        display: none;
+    }
+</style>
+<script type="text/javascript">
+    var map;
+    var lt;
+    var br;
+    var lng_t;
+    var lat_t;
+    var lng_b;
+    var lat_b;
+    var cur_center;
+    var vertical_num = -1;
+    var i = 0;
+    var zoom = 14;
+    document.documentElement.style.overflowY = 'hidden';
+    map = new qq.maps.Map(document.getElementById("container"), {
+        center: new qq.maps.LatLng(39.916527,116.397128),      // 地图的中心地理坐标。
+        zoom:zoom                                             // 地图的中心地理坐标。
+    });
+
+    qq.maps.event.addListener(map, 'click', function (e) {
+        // body...
+        // alert('点击的位置为：' + event.latLng.getLat() + ',' + event.latLng.getLng());
+        if (i == 0) {
+            i += 1;
+            document.getElementById('left-top').value = e.latLng.getLng().toFixed(6) + ',' + e.latLng.getLat().toFixed(6);
+        }
+        else{
+            i -= 1;
+            document.getElementById('right-bottom').value = e.latLng.getLng().toFixed(6) + ',' + e.latLng.getLat().toFixed(6);
+        }
+    })
+
+    function center_info(lv){
+        center = map.getCenter();
+        lng = center.getLng();
+        lat = center.getLat();
+        if (lv == 'l') {
+            return lng;
+        }
+        else{
+            return lat;
+        }
+    }
+
+    function level_move() {
+        lng = center_info('l');
+        if(lng < lng_b){
+            map.panBy(640, 0);
+        }else{
+            // 停止水平移动
+            document.getElementById('level_num').value = 1;
+        }
+    }
+
+    function to_origin() {
+        map.setCenter(cur_center);
+    }
+
+
+    function start_ss() {
+        // body...
+        lt = document.getElementById('left-top').value;
+        br = document.getElementById('right-bottom').value;
+        lng_t = parseFloat(lt.split(',')[0]);
+        lat_t = parseFloat(lt.split(',')[1]);
+        lng_b = parseFloat(br.split(',')[0]);
+        lat_b = parseFloat(br.split(',')[1]);
+        cur_center = new qq.maps.LatLng(lat_t, lng_t);
+        map.setCenter(cur_center);
+        map.setZoom(zoom);
+        document.getElementById('start').value = 1;
+    }
+
+    function vertical_move() {
+        lat = center_info('v');
+        if (lat > lat_b) {
+            // 垂直移动并记录当前的center
+            vertical_num += 1;
+            map.panBy(0, 614);
+            cur_center = new qq.maps.LatLng(center_info('v'), center_info('l'));
+             document.getElementById('level_num').value = 0;
+        }else{
+            document.getElementById('start').value = 2;
+        }
+    }
+</script>
+</html>

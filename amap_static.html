@@ -62,7 +62,7 @@
     <input type="button" id="level_num" style="visibility: hidden;" value=0>
 </div>
 <script>
-    var zoom = 17;
+    var zoom = 13;
     var map = new AMap.Map('container', {
         resizeEnable: true,
         zoom:zoom,
@@ -133,7 +133,7 @@
         if (lat > lat_b) {
             // 垂直移动并记录当前的center
             vertical_num += 1;
-            map.panBy(0, -614);
+            map.panBy(0, -606);
             cur_center = [center_info('l'), center_info('v')]
              document.getElementById('level_num').value = 0;
         }else{
